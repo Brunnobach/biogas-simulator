@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biogas Simulator - Viabilidade Econômica de Biodigestores</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">Biogas<span class="logo-highlight">Simulator</span></span>
+            </div>
+            <div class="header-tag">Micro SaaS v1.0</div>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero">
+            <h1>Simule a Viabilidade do Seu Biodigestor</h1>
+            <p class="hero-sub">Descubra em segundos: investimento, payback, ROI e geração de energia. <strong>100% gratuito.</strong></p>
+        </section>
+
+        <!-- Form -->
+        <section class="simulator-form">
+            <div class="form-card">
+                <h2>🐄 Dados da Propriedade</h2>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="animal_type">Tipo de Animal</label>
+                        <select id="animal_type" class="form-select">
+                            <option value="bovino">🐄 Bovino (gado de corte/leite)</option>
+                            <option value="suino">🐷 Suíno</option>
+                            <option value="avícola">🐔 Avícola (galináceos)</option>
+                            <option value="ovino">🐑 Ovino/Caprino</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="num_animals">Quantidade de Animais</label>
+                        <input type="number" id="num_animals" class="form-input" value="100" min="1" max="100000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="digester_type">Tipo de Biodigestor</label>
+                        <select id="digester_type" class="form-select">
+                            <option value="chinese">🇨🇳 Chinês (Batelada)</option>
+                            <option value="indian">🇮🇳 Indiano (Fluxo Contínuo)</option>
+                            <option value="cobertura">🌊 Cobertura de Lagoa</option>
+                            <option value="tubular">🇨🇦 Canadense/Tubular</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location_state">Estado (UF)</label>
+                        <select id="location_state" class="form-select">
+                            <option value="MG">Minas Gerais</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="PR">Paraná</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                            <option value="BA">Bahia</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="CE">Ceará</option>
+                            <option value="PA">Pará</option>
+                            <option value="TO">Tocantins</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="OUTRO">Outro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section-divider"></div>
+
+                <h3>⚡ Configurações Avançadas</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="eletricity_cost">Custo da Energia (R$/kWh)</label>
+                        <input type="number" id="eletricity_cost" class="form-input" value="0.78" step="0.01" min="0.1" max="5.0">
+                        <span class="form-hint">Deixe em branco para usar tarifa média do estado</span>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="has_generator">
+                            <span class="checkmark"></span>
+                            <span class="checkbox-text">Incluir Gerador de Energia</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group" id="generator_power_group" style="display:none;">
+                        <label for="generator_power">Potência do Gerador (kW)</label>
+                        <input type="number" id="generator_power" class="form-input" value="50" min="1" max="1000">
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="use_credit_carbono">
+                            <span class="checkmark"></span>
+                            <span class="checkbox-text">Incluir Crédito de Carbono</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button class="btn-simulate" onclick="runSimulation()">
+                    <span class="btn-icon">▶</span>
+                    Simular Viabilidade
+                </button>
+            </div>
+        </section>
+
+        <!-- Results -->
+        <section class="results" id="results" style="display:none;">
+            <div class="results-header">
+                <h2>📊 Resultado da Simulação</h2>
+                <div class="viability-badge" id="viability-badge">VIÁVEL</div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card kpi-invest">
+                    <div class="kpi-label">Investimento Total</div>
+                    <div class="kpi-value" id="kpi-invest">R$ 0,00</div>
+                </div>
+                <div class="kpi-card kpi-payback">
+                    <div class="kpi-label">Payback</div>
+                    <div class="kpi-value" id="kpi-payback">0 anos</div>
+                </div>
+                <div class="kpi-card kpi-roi">
+                    <div class="kpi-label">ROI Anual</div>
+                    <div class="kpi-value" id="kpi-roi">0%</div>
+                </div>
+                <div class="kpi-card kpi-energy">
+                    <div class="kpi-label">Energia/Dia</div>
+                    <div class="kpi-value" id="kpi-energy">0 kWh</div>
+                </div>
+            </div>
+
+            <!-- Energy Chart -->
+            <div class="chart-card">
+                <h3>⚡ Geração de Energia</h3>
+                <div class="chart-bars">
+                    <div class="bar-item">
+                        <div class="bar-label">Diária</div>
+                        <div class="bar-container">
+                            <div class="bar" id="bar-daily"></div>
+                        </div>
+                        <div class="bar-value" id="bar-daily-val">0 kWh</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">Mensal</div>
+                        <div class="bar-container">
+                            <div class="bar" id="bar-monthly"></div>
+                        </div>
+                        <div class="bar-value" id="bar-monthly-val">0 kWh</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">Anual</div>
+                        <div class="bar-container">
+                            <div class="bar" id="bar-yearly"></div>
+                        </div>
+                        <div class="bar-value" id="bar-yearly-val">0 kWh</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial -->
+            <div class="financial-grid">
+                <div class="fin-card">
+                    <h4>💰 Economia com Energia</h4>
+                    <div class="fin-row">
+                        <span>Mensal</span>
+                        <strong id="fin-eco-mes">R$ 0,00</strong>
+                    </div>
+                    <div class="fin-row">
+                        <span>Anual</span>
+                        <strong id="fin-eco-ano">R$ 0,00</strong>
+                    </div>
+                </div>
+                <div class="fin-card">
+                    <h4>🌱 Crédito de Carbono</h4>
+                    <div class="fin-row">
+                        <span>CO₂ evitado/ano</span>
+                        <strong id="fin-co2">0 ton</strong>
+                    </div>
+                    <div class="fin-row">
+                        <span>Valor anual</span>
+                        <strong id="fin-carbono-val">R$ 0,00</strong>
+                    </div>
+                </div>
+                <div class="fin-card">
+                    <h4>📈 Receita Total</h4>
+                    <div class="fin-row">
+                        <span>Receita/ano</span>
+                        <strong id="fin-receita">R$ 0,00</strong>
+                    </div>
+                    <div class="fin-row">
+                        <span>Lucro líquido/ano</span>
+                        <strong id="fin-lucro">R$ 0,00</strong>
+                    </div>
+                    <div class="fin-row">
+                        <span>VPL (10 anos)</span>
+                        <strong id="fin-vpl">R$ 0,00</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Production -->
+            <div class="production-card">
+                <h3>🏭 Produção de Biogás</h3>
+                <div class="prod-grid">
+                    <div class="prod-item">
+                        <div class="prod-icon">💧</div>
+                        <div class="prod-value" id="prod-dejeto">0 m³</div>
+                        <div class="prod-label">Dejetos/dia</div>
+                    </div>
+                    <div class="prod-item">
+                        <div class="prod-icon">🔥</div>
+                        <div class="prod-value" id="prod-biogas">0 m³</div>
+                        <div class="prod-label">Biogás/dia</div>
+                    </div>
+                    <div class="prod-item">
+                        <div class="prod-icon">🧪</div>
+                        <div class="prod-value" id="prod-ch4">0 m³</div>
+                        <div class="prod-label">CH₄ puro/dia</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scenarios -->
+            <div class="scenarios-card">
+                <h3>🔀 Comparativo por Tipo de Biodigestor</h3>
+                <table class="scenarios-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Investimento</th>
+                            <th>Payback</th>
+                            <th>ROI</th>
+                            <th>Viabilidade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scenarios-tbody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="recommendations-card">
+                <h3>💡 Recomendações</h3>
+                <ul id="recommendations-list">
+                </ul>
+            </div>
+
+            <!-- CTA -->
+            <div class="cta-section">
+                <h3>🚀 Quero Implementar na Minha Propriedade</h3>
+                <p>Receba um relatório técnico completo em PDF com todos os cálculos detalhados.</p>
+                <div class="cta-form">
+                    <input type="email" id="lead_email" placeholder="seu@email.com" class="cta-input">
+                    <button class="btn-cta" onclick="generatePDF()">
+                        📄 Gerar Relatório PDF
+                    </button>
+                </div>
+                <p class="cta-note">Versão PRO: cenários customizados, comparativo detalhado, suporte técnico — <strong>R$ 97/mês</strong></p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Biogas Simulator v1.0 — Desenvolvido com ❤️ para o agronegócio brasileiro</p>
+            <p class="footer-tech">Stack: Python + Ollama (Qwen 3.5) | 100% local | Zero APIs pagas</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
