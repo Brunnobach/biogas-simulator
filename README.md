@@ -202,7 +202,7 @@ Este projeto é **open source** sob licença MIT. Contribuições são bem-vinda
 
 **Brunno Bachmann** — Engenheiro & Empreendedor
 - 🌐 [LinkedIn](https://linkedin.com/in/brunnobachmann)
-- 📧 brunno@seudominio.com
+- 📧 brunnobachmann@gmail.com
 - 🐦 [@brunnobachmann](https://twitter.com/brunnobachmann)
 
 ---
